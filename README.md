@@ -1,6 +1,9 @@
-# music
+# music-client
 
-> A Vue.js project
+> 音乐网站-客户端
+
+## 2023.01.13版本优化
+优化了点击图片显示歌词，再次点击图片回到上一个路径  
 
 ## Build Setup
 

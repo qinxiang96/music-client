@@ -18,8 +18,15 @@
           <el-radio :label="1">male</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item prop="phoneNum" label="phone" >
-        <el-input  placeholder="phone" v-model="registerForm.phoneNum"></el-input>
+      <el-form-item prop="phoneNum" label="phone">
+        <el-input  placeholder="phone" v-model="registerForm.phoneNum">
+        </el-input>
+      </el-form-item>
+      <el-form-item prop="codeNum" label="code">
+        <el-input  placeholder="verify code" v-model="registerForm.codeNum">
+          <el-button slot="suffix" type="primary" plain v-show="isAvailable == true" @click="sendCode">Send Code</el-button>
+          <el-button slot="suffix" type="info" plain v-show="isAvailable == false">Resend in {{totalTime}} S</el-button>
+        </el-input>
       </el-form-item>
       <el-form-item prop="email" label="email">
         <el-input v-model="registerForm.email" placeholder="email"></el-input>
@@ -48,7 +55,7 @@
 import loginLogo from '../components/LoginLogo'
 import { mixin } from '../mixins'
 import { rules, cities } from '../assets/data/form'
-import { SignUp } from '../api/index'
+import { SignUp, sendCode } from '../api/index'
 
 export default {
   name: 'SignUp-page',
@@ -58,6 +65,8 @@ export default {
   mixins: [mixin],
   data () {
     return {
+      isAvailable: true,
+      totalTime: 0,  // 倒计时时间
       registerForm: { // 注册
         username: '',
         password: '',
@@ -110,7 +119,38 @@ export default {
     },
     goback (index) {
       this.$router.go(index)
-    }
+    },
+    sendCode () {
+      // 给指定手机号发送验证码
+      let params = new URLSearchParams()
+      params.append('phone_num', this.registerForm.phoneNum)
+      sendCode(params)
+        .then(res => {
+          console.log(res)
+          if (res.code != 1){
+            alert (res.msg)
+          }
+        })
+        .catch(err => {
+          console.log(err)
+        })
+
+      // 倒计时
+      this.countDown()
+      
+
+    },
+    countDown () {
+        this.isAvailable = false;
+        this.totalTime = 60;
+        var setTimeoutS = setInterval(() => {  
+          this.totalTime--;   
+          if (this.totalTime <= 0) {     
+            clearInterval(setTimeoutS);  
+            this.isAvailable = true;      
+          }   
+        }, 1000);
+      }
   }
 }
 </script>

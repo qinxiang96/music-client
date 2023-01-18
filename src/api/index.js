@@ -7,6 +7,8 @@ import { get, post } from './http'
 export const loginIn = (params) => post(`consumer/verifyPassword`, params)
 // 注册
 export const SignUp = (params) => post(`consumer/add`, params)
+// 发送验证码
+export const sendCode = (params) => post(`sms/sendcode`, params)
 // 更新用户信息
 export const updateUserMsg = (params) => post(`consumer/update`, params)
 // 返回指定ID的用户

@@ -18,12 +18,12 @@
           <el-radio :label="1">male</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item prop="phoneNum" label="phone">
+      <el-form-item prop="phoneNum" label="phoneNum">
         <el-input  placeholder="phone" v-model="registerForm.phoneNum">
         </el-input>
       </el-form-item>
-      <el-form-item prop="codeNum" label="code">
-        <el-input  placeholder="verify code" v-model="registerForm.codeNum">
+      <el-form-item prop="code" label="code">
+        <el-input  placeholder="verify code" v-model="registerForm.code">
           <el-button slot="suffix" type="primary" plain v-show="isAvailable == true" @click="sendCode">Send Code</el-button>
           <el-button slot="suffix" type="info" plain v-show="isAvailable == false">Resend in {{totalTime}} S</el-button>
         </el-input>
@@ -44,7 +44,7 @@
       </el-form-item>
       <div class="login-btn">
         <el-button @click="goback(-1)">cancel</el-button>
-        <el-button type="primary" @click="SignUp">submit</el-button>
+        <el-button type="primary" @click="SignUp('registerForm')">submit</el-button>
       </div>
     </el-form>
   </div>
@@ -70,8 +70,9 @@ export default {
       registerForm: { // 注册
         username: '',
         password: '',
-        sex: '',
+        sex: 1,
         phoneNum: '',
+        code: '',
         email: '',
         birth: '',
         introduction: '',
@@ -86,59 +87,81 @@ export default {
     this.cities = cities
   },
   methods: {
-    SignUp () {
-      let _this = this
-      let d = this.registerForm.birth
-      let datetime = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate()
-      let params = new URLSearchParams()
-      params.append('username', this.registerForm.username)
-      params.append('password', this.registerForm.password)
-      params.append('sex', this.registerForm.sex)
-      params.append('phone_num', this.registerForm.phoneNum)
-      params.append('email', this.registerForm.email)
-      params.append('birth', datetime)
-      params.append('introduction', this.registerForm.introduction)
-      params.append('location', this.registerForm.location)
-      params.append('avator', '/img/user.jpg')
-      SignUp(params)
-        .then(res => {
-          console.log(res)
-          if (res.code === 1) {
-            _this.notify('register successfully', 'success')
-            // 2秒后跳转到首页
-            setTimeout(function () {
-              _this.$router.push({path: '/'})
-            }, 2000)
-          } else {
-            _this.notify('register failed', 'error')
-          }
-        })
-        .catch(err => {
-          console.log(err)
-        })
+    SignUp (registerForm) {
+      // 数据验证
+      this.$refs[registerForm].validate((valid) =>{
+        if (valid) {
+          // 数据验证通过后执行提交
+          let _this = this
+          let d = this.registerForm.birth
+          let datetime = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate()
+          let params = new URLSearchParams()
+          params.append('username', this.registerForm.username)
+          params.append('password', this.registerForm.password)
+          params.append('sex', this.registerForm.sex)
+          params.append('phoneNum', this.registerForm.phoneNum)
+          params.append('code', this.registerForm.code)
+          params.append('email', this.registerForm.email)
+          params.append('birth', datetime)
+          params.append('introduction', this.registerForm.introduction)
+          params.append('location', this.registerForm.location)
+          params.append('avator', '/img/user.jpg')
+          SignUp(params)
+            .then(res => {
+              console.log(res)
+              if (res.code === 1) {
+                _this.notify('register successfully', 'success')
+                // 2秒后跳转到首页
+                setTimeout(function () {
+                  _this.$router.push({path: '/'})
+                }, 2000)
+              } else {
+                _this.notify('register failed', 'error')
+              }
+            })
+            .catch(err => {
+              console.log(err)
+            })
+        } else {
+          console.log ("error submit!")
+          return false
+        }
+      })
     },
     goback (index) {
       this.$router.go(index)
     },
     sendCode () {
-      // 给指定手机号发送验证码
-      let params = new URLSearchParams()
-      params.append('phone_num', this.registerForm.phoneNum)
-      sendCode(params)
-        .then(res => {
-          console.log(res)
-          if (res.code != 1){
-            alert (res.msg)
-          }
-        })
-        .catch(err => {
-          console.log(err)
-        })
+      // 先判断手机号有填写
+      if (!this.registerForm.phoneNum) {
+        alert ("Phone is required")
+        return
+      }
+      // 数据验证
+      this.$refs.registerForm.validateField('phoneNum', (err) => {
+        if (err) {
+          alert ("phone number format error")
+          return false
+        }else {
+          // 给指定手机号发送验证码
+          let params = new URLSearchParams()
+          params.append('phone_num', this.registerForm.phoneNum)
+          sendCode(params)
+            .then(res => {
+              console.log(res)
+              if (res.code != 1){
+                alert (res.msg)
+              }
+            })
+            .catch(err => {
+              console.log(err)
+            })
 
-      // 倒计时
-      this.countDown()
-      
-
+          // 倒计时
+          this.countDown()
+        }
+        
+      })
     },
     countDown () {
         this.isAvailable = false;

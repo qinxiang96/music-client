@@ -10,7 +10,18 @@ const rules = {
     { required: true, message: 'please select sex', trigger: 'change' }
   ],
   phoneNum: [
-    { essage: 'please select date', trigger: 'blur' }
+    { required: true, message: 'please input phone', trigger: 'blur' },
+    { validator: function(rule, value, callback) {
+      if (/^1[34578]\d{9}$/.test(value) == false) {
+        callback(new Error("phone number format error"));
+      } else {
+        callback();
+      }
+    },
+    trigger: "blur" }
+  ],
+  code: [
+    { required: true, message: 'please input verify code', trigger: 'blur' }
   ],
   email: [
     { message: 'please input email address', trigger: 'blur' },

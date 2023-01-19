@@ -82,7 +82,7 @@ export default {
               message: 'login successfully',
               type: 'success'
             })
-            _this.setUserMsg(res.userMsg[0])
+            _this.setUserMsg(res.userMsg)
             _this.$store.commit('setLoginIn', true)
             setTimeout(function () {
               _this.changeIndex('Home Page')

@@ -2,7 +2,8 @@ const user = {
   state: {
     userId: '',
     username: '',
-    avator: ''
+    avator: '',
+    collectToken: ''
   },
   getters: {
     userId: state => {
@@ -25,6 +26,13 @@ const user = {
         avator = JSON.parse(window.localStorage.getItem('avator') || null)
       }
       return avator
+    },
+    collectToken: state => {
+      let collectToken = state.collectToken
+      if (!collectToken) {
+        collectToken = JSON.parse(window.localStorage.getItem('collectToken') == undefined? null: window.localStorage.getItem('collectToken') == undefined|| null)
+      }
+      return collectToken
     }
   },
   mutations: {
@@ -39,6 +47,10 @@ const user = {
     setAvator: (state, avator) => {
       state.avator = avator
       window.localStorage.setItem('avator', JSON.stringify(avator))
+    },
+    setCollectToken: (state, collectToken) => {
+      state.collectToken = collectToken
+      window.localStorage.setItem('collectToken', JSON.stringify(collectToken))
     }
   },
   actions: {}

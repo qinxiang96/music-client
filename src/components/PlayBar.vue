@@ -122,6 +122,7 @@ export default {
       'showAside', // 是否显示侧边栏
       'autoNext', // 用于触发自动播放下一首
       'isActive',
+      'collectToken', // 收藏令牌
     ])
   },
   watch: {
@@ -345,12 +346,15 @@ export default {
         params.append('userId', this.userId)
         params.append('type', 0) // 0 代表歌曲， 1 代表歌单
         params.append('songId', this.id)
+        params.append('collectToken', this.collectToken)
         setCollection(params)
           .then(res => {
             if (res.code === 1) {
               this.$store.commit('setIsActive', true)
+              this.$store.commit('setCollectToken', res.collectToken)
               this.notify('collect successfully', 'success')
-            } else if (res.code === 2) {
+            } else if (res.code === 10005) {
+              this.$store.commit('setCollectToken', res.collectToken)
               this.notify('collect song is be collected already', 'warning')
             } else {
               this.$notify.error({
